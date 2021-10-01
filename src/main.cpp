@@ -248,9 +248,28 @@ static inline void render_imgui(const int &w, const int &h, const ImFont* standa
 
     if(ImGui::BeginMenuBar())
     {
-        if(ImGui::BeginMenu("TEST", true))
+        if(ImGui::BeginMenu("File", true))
         {
             if(ImGui::MenuItem("Test Menu Item.", nullptr)){}
+            ImGui::EndMenu();
+        }
+
+        if(ImGui::BeginMenu("Edit", true))
+        {
+            if(ImGui::MenuItem("Paste", nullptr))
+            {}
+            ImGui::EndMenu();
+        }
+
+        if(ImGui::BeginMenu("View"))
+        {
+            if(ImGui::MenuItem("Fullscreen", nullptr)){}
+            ImGui::EndMenu();
+        }
+
+        if(ImGui::BeginMenu("Help"))
+        {
+            if(ImGui::MenuItem("About", nullptr)){}
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
