@@ -3,14 +3,15 @@
 #include <cassert>
 
 #include <SDL.h>
+#include "macos.h"
 
 #include "imgui/imgui.h"
 #include "imgui/backends/imgui_impl_sdl.h"
 #include "imgui/backends/imgui_impl_sdlrenderer.h"
 
 namespace {
-static constexpr std::chrono::duration<long int, std::milli> ideal_frame_time(16);
-static constexpr std::chrono::duration<long int, std::milli> zero(0);
+static constexpr std::chrono::duration<int64_t, std::milli> ideal_frame_time(16);
+static constexpr std::chrono::duration<int64_t, std::milli> zero(0);
 
 static bool _DemoWindowShown = false;
 static bool _HighDPI = false;
@@ -27,7 +28,7 @@ private:
 public:
     template<std::size_t N>
     constexpr str_const(const char(&a)[N]) : _p(a), _sz(N-1){} // Move constructor. a is a char array of size N.
-    constexpr char operator[](std::size_t n)
+    constexpr char operator[](std::size_t n) const
     {
         return n < _sz ? _p[n] : throw std::out_of_range("");
     }
@@ -66,10 +67,12 @@ struct SDL2_GAME
         }
         else
         {
+            // TODO: Fix macOS High DPI support
+            // https://github.com/ocornut/imgui/issues/3757#issuecomment-800921198
             auto window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE /*| SDL_WINDOW_ALLOW_HIGHDPI*/;
             game_window = std::make_shared<SDL_Window*>(SDL_CreateWindow("Just a test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags));
             
-            renderer = std::make_shared<SDL_Renderer*>(SDL_CreateRenderer(*game_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
+            renderer = std::make_shared<SDL_Renderer*>(SDL_CreateRenderer(*game_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED | SDL_WINDOW_OPENGL));
         }
     }
 
@@ -222,7 +225,7 @@ struct timeinfo_t
     }
 };
 
-static struct timeinfo_t<std::chrono::duration<long int, std::milli>> last_frame_time;
+static struct timeinfo_t<std::chrono::duration<int64_t, std::milli>> last_frame_time;
 
 static inline void perform_clamp_test()
 {
@@ -313,8 +316,8 @@ static inline void render_imgui(const int &w, const int &h, const ImFont* standa
 static inline void render_time_debug_imgui()
 {
     ImGui::Begin("Time Debug");
-    ImGui::Text("Frame Time: %ld", last_frame_time.frame_time.count());
-    ImGui::Text("Delay Time (to hit 16ms): %ld", last_frame_time.delay_time.count());
+    ImGui::Text("Frame Time: %lld", last_frame_time.frame_time.count());
+    ImGui::Text("Delay Time (to hit 16ms): %lld", last_frame_time.delay_time.count());
     ImGui::End();
 }
 
@@ -358,7 +361,8 @@ static inline void SimpLoop(VIDEO_BACKEND& game, UI_BACKEND& imgui)
             std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_begin);
         auto delayTime = 
             std::chrono::duration_cast<std::chrono::milliseconds>(ideal_frame_time - frameTime);
-        auto diff = CLAMP(delayTime, zero, ideal_frame_time);
+        
+        std::chrono::duration<int64_t, std::milli> diff = CLAMP(delayTime, zero, ideal_frame_time);
         
         last_frame_time.set(delayTime, frameTime);
         // std::cout << "Frame Time: " << frameTime.count() << "; Delay Time: " << diff.count() << std::endl;
@@ -371,7 +375,16 @@ int main(int argc, const char **argv)
 {
     std::cout << "Hello World!" << std::endl;
 
+
+    
+
     SDL2_GAME game;
+    const char *curRenderDriver = SDL_GetHint(SDL_HINT_RENDER_DRIVER);
+    if(curRenderDriver == NULL)
+        std::cerr << "CUR RENDER DRIVER IS NULL!" << std::endl;
+    else
+        std::cout << "Cur Render Driver: " << curRenderDriver << std::endl;
+
     IMGUI_UI imgui = IMGUI_UI(game, "Fonts/Roboto-Medium.ttf");
 
     // std::chrono::
