@@ -42,7 +42,13 @@ message("include directories:")
 foreach(dir ${INCLUDES})
         message(STATUS ${dir})
 endforeach()
-add_executable(${PROJECT_N} src/macos.m ${SRCS})
+
+# TODO: Build the sources list separately and make one add_executable call.
+if(APPLE)
+    add_executable(${PROJECT_N} src/macos.m ${SRCS} ${RESOURCES})
+else()
+    add_executable(${PROJECT_N} ${SRCS} ${RESOURCES})
+endif()
 
 # find_file(SDL2_INCLUDE_DIR NAME SDL.h HINTS SDL2)
 # find_library(SDL2_LIBRARY SDL2)
@@ -55,7 +61,17 @@ message("SDL2 INCLUDE DIR: ${SDL2_INCLUDE_DIRS}\n")
 if(DO_STATIC)
     target_link_libraries(${PROJECT_N} PUBLIC -static -static-libgcc -static-libstdc++ SDL2::SDL2-static)
 else()
-    target_link_libraries(${PROJECT_N} PUBLIC ${SDL2_LIBRARIES} "-framework CoreFoundation")
+    target_link_libraries(${PROJECT_N} PUBLIC ${SDL2_LIBRARIES})
+    if(APPLE)
+        target_link_libraries(${PROJECT_N} PUBLIC "-framework CoreFoundation")
+    endif()
 endif()
 target_include_directories(${PROJECT_N} PUBLIC include src/imgui ${SDL2_INCLUDE_DIRS})
 # target_include_directories(${PROJECT_N} PUBLIC )
+
+# Copy Resources Directory
+add_custom_command(TARGET ${PROJECT_N} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/Fonts/
+            ${CMAKE_CURRENT_BINARY_DIR}/Fonts/
+)

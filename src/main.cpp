@@ -9,15 +9,17 @@
 #include "imgui/backends/imgui_impl_sdl.h"
 #include "imgui/backends/imgui_impl_sdlrenderer.h"
 
-namespace {
-static constexpr std::chrono::duration<int64_t, std::milli> ideal_frame_time(16);
-static constexpr std::chrono::duration<int64_t, std::milli> zero(0);
+// Our globals & constants.
+namespace 
+{
+    static constexpr std::chrono::duration<int64_t, std::milli> ideal_frame_time(16);
+    static constexpr std::chrono::duration<int64_t, std::milli> zero(0);
 
-static bool _DemoWindowShown = false;
-static bool _HighDPI = false;
+    static bool _DemoWindowShown = false;
+    static bool _HighDPI = false;
 
-static const ImVec2 ImVec2_Zero(0.f, 0.f);
-static constexpr bool show_main_window = true;
+    static const ImVec2 ImVec2_Zero(0.f, 0.f);
+    static constexpr bool show_main_window = true;
 }
 
 struct str_const
