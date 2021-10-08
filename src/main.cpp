@@ -4,6 +4,7 @@
 
 #include "video_backend.h"
 #include "ui_backend.h"
+#include "logging.h"
 
 // Our globals & constants.
 namespace 
@@ -174,9 +175,9 @@ static inline void SimpLoop(VIDEO_BACKEND& game, UI_BACKEND& imgui)
 
 int main(int argc, const char **argv)
 {
-    std::cout << "Hello World!" << std::endl;
-    std::cout << "Video Backend: " << _BACKEND_TYPE_STR << std::endl;
-    std::cout << "UI Backend: " << _UI_BACKEND_TYPE_STR << std::endl;
+    ms::cout << "Hello World!" << "\n";
+    ms::cout << "Video Backend: " << _BACKEND_TYPE_STR << "\n";
+    ms::cout << "UI Backend: " << _UI_BACKEND_TYPE_STR << "\n";
     
 
     _BACKEND_TYPE game;

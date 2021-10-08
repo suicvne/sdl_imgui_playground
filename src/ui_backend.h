@@ -16,6 +16,8 @@
 
 #define _ENDIF_UI_BACKEND_EQUALS()
 
+#include "pp_fuckery.h"
+
 struct IMGUI_UI
 {
     explicit IMGUI_UI(const _BACKEND_TYPE &sdl2, const char* fontFileName = nullptr)
