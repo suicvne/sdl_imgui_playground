@@ -6,6 +6,13 @@
 #include "ui_backend.h"
 #include "logging.h"
 
+#ifdef __APPLE__
+#include "macos.h"
+
+#define _TRY_FANCY
+
+#endif
+
 // Our globals & constants.
 namespace 
 {
@@ -37,7 +44,11 @@ static inline void perform_clamp_test()
 
 static inline void render_imgui(const int &w, const int &h, const ImFont* standard_font)
 {
+    #ifdef __APPLE__
+    // ImGui::SetNextWindowPos(ImVec2(0, 32), ImGuiCond_Always);
+    #else
     ImGui::SetNextWindowPos(ImVec2_Zero, ImGuiCond_Always);
+    #endif
     ImGui::SetNextWindowSize(ImVec2(w, h), ImGuiCond_Always);
 
     ImGui::Begin("Hello World", ((bool*)&show_main_window), 
@@ -45,6 +56,12 @@ static inline void render_imgui(const int &w, const int &h, const ImFont* standa
 
     if(ImGui::BeginMenuBar())
     {
+        #ifdef __APPLE__
+        #ifdef _TRY_FANCY
+        if(ImGui::BeginMenu("          ", false)) ImGui::EndMenu();
+        #endif
+        #endif
+
         if(ImGui::BeginMenu("File", true))
         {
             if(ImGui::MenuItem("Test Menu Item.", nullptr)){}
@@ -173,6 +190,14 @@ static inline void SimpLoop(VIDEO_BACKEND& game, UI_BACKEND& imgui)
     }
 }
 
+/*
+
+TODO FOR FUN:
+Mess around with a circular buffer for graphing frame times.
+Because why not?
+
+*/
+
 int main(int argc, const char **argv)
 {
     ms::cout << "Hello World!" << "\n";
@@ -193,7 +218,15 @@ int main(int argc, const char **argv)
 
     IMGUI_UI imgui = IMGUI_UI(game, "Fonts/Roboto-Medium.ttf");
     
-    game.set__UI_Hook_Render(((void(*)())&IMGUI_UI::UI_Render_Hook));
+    // ((void(*)())&IMGUI_UI::UI_Render_Hook)
+    game.set__UI_Hook_Render((void(*)())void_cast(&IMGUI_UI::UI_Render_Hook));
+
+    #ifdef __APPLE__
+    #ifdef _TRY_FANCY
+    auto nsw = AppleUtils::TESTAPPLEUTILS(*(game.get_game_window()));
+    AppleUtils::SetTitlebarAppearsTransparent(nsw, true);
+    #endif
+    #endif
 
     // std::chrono::
 

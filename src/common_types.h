@@ -3,6 +3,23 @@
 
 #include <iostream>
 
+// Declares a type called "_fn_ptr" that is a function pointer (returning void, no args)
+typedef void (*_fn_ptr)(); 
+template<typename T, typename R>
+_fn_ptr void_cast(R(T::*f)())
+{
+    // By utilizing a union here, we get low-level
+    // enough to allow Clang to cast our member function 
+    // to our _fn_ptr type
+    union
+    {
+        R(T::*pf)();
+        _fn_ptr p;
+    };
+
+    pf = f;
+    return p;
+}
 
 #define CLAMP(a, min, max) ((a) < (min) ? (min) : (a) > (max) ? (max) : (a))
 

@@ -85,13 +85,18 @@ if(DO_STATIC)
     target_link_libraries(${PROJECT_N} PUBLIC -static -static-libgcc -static-libstdc++ SDL2::SDL2-static)
 else()
     target_link_libraries(${PROJECT_N} PUBLIC ${SDL2_LIBRARIES})
-    target_link_libraries(${PROJECT_N_LIB} PUBLIC ${SDL2_LIBRARIES})
+    if(NOT APPLE)
+        target_link_libraries(${PROJECT_N_LIB} PUBLIC ${SDL2_LIBRARIES})
+    endif()
     if(APPLE)
-        target_link_libraries(${PROJECT_N} PUBLIC "-framework CoreFoundation")
+        target_link_libraries(${PROJECT_N} PUBLIC "-framework CoreFoundation" "-framework AppKit")
     endif()
 endif()
 target_include_directories(${PROJECT_N} PUBLIC include src/imgui src/imgui/backends ${SDL2_INCLUDE_DIRS})
+
+if(NOT APPLE)
 target_include_directories(${PROJECT_N_LIB} PUBLIC include src/imgui src/imgui/backends ${SDL2_INCLUDE_DIRS})
+endif()
 # target_include_directories(${PROJECT_N} PUBLIC )
 
 # Copy Resources Directory
@@ -102,11 +107,14 @@ add_custom_command(TARGET ${PROJECT_N} POST_BUILD
 )
 
 include(GNUInstallDirs)
+
+if(NOT APPLE)
 install(TARGETS ${PROJECT_N_LIB}
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qgui
 )
+endif()
 
 install(FILES ${LIB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qgui)

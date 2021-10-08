@@ -9,13 +9,21 @@
 #ifndef __APPLE_H__
 
 struct SDL_Window;
-extern int __AppleUtils_TESTAPPLEUTILS(struct SDL_Window *_game_win);
+extern "C" {
+    extern void *__AppleUtils_TESTAPPLEUTILS(struct SDL_Window *_game_win);
+    extern void __AppleUtils_SetTitlebarAppearsTransparent(void *_win, int _beTransparent);
+}
 
 struct AppleUtils
 {
-    static inline int TESTAPPLEUTILS(struct SDL_Window *_game_win)
+    static inline void *TESTAPPLEUTILS(struct SDL_Window *_game_win)
     {
         return __AppleUtils_TESTAPPLEUTILS(_game_win);
+    }
+    
+    static inline void SetTitlebarAppearsTransparent(void *_win, int _beTransparet)
+    {
+        __AppleUtils_SetTitlebarAppearsTransparent(_win, _beTransparet);
     }
 };
 // struct AppleUtils
