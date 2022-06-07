@@ -15,6 +15,7 @@
 + (void) SetTitlebarAppearsTransparent:(NSWindow *)_window :(bool)_beTransparent;
 @end
 
+
 @implementation AppleUtils
 + (NSWindow *) TESTAPPLEUTILS:(SDL_Window*)_game_win
 {
@@ -46,6 +47,30 @@
     _window.backgroundColor = blackColor;
 }
 @end
+
+
+// TODO: Create a generator to assist with this. 
+/* Something that works like: 
+
+_EXPOSE_OBJC(AppleUtils, SetTitlebarAppearsTransparent,
+{
+    _window.styleMask |= NSFullSizeContentViewWindowMask;
+    // etc. 
+})
+
+this is definitely not 100% accurate macro........
+#define _EXPOSE_OBJC(clsName, methodName, impl) \
++ (void) methodName\
+impl\
+\
+void __## clsName ##_## methodName ##()\
+{\
+    return [clsName methodName];\
+}\
+
+
+
+*/
 
 void* __AppleUtils_TESTAPPLEUTILS(SDL_Window *_game_win)
 {

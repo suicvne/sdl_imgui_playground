@@ -45,7 +45,12 @@ static inline void perform_clamp_test()
 static inline void render_imgui(const int &w, const int &h, const ImFont* standard_font)
 {
     #ifdef __APPLE__
+    #ifdef _TRY_FANCY
+    ImGui::SetNextWindowPos(ImVec2_Zero, ImGuiCond_Always);
     // ImGui::SetNextWindowPos(ImVec2(0, 32), ImGuiCond_Always);
+    #else
+    ImGui::SetNextWindowPos(ImVec2_Zero, ImGuiCond_Always);
+    #endif
     #else
     ImGui::SetNextWindowPos(ImVec2_Zero, ImGuiCond_Always);
     #endif
@@ -227,9 +232,8 @@ int main(int argc, const char **argv)
     AppleUtils::SetTitlebarAppearsTransparent(nsw, true);
     #endif
     #endif
-
-    // std::chrono::
-
+    
+    // Begin the looooooooop
     SimpLoop(game, imgui);
 
     return 0;
